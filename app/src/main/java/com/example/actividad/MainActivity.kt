@@ -249,7 +249,7 @@ fun ViewContainer(){
                 icon = { Icon(Icons.Filled.Image, contentDescription = "" )},
                 onClick = {
                     scope.launch {
-                        snackbarHostState.showSnac kbar("Snackbar")
+                        snackbarHostState.showSnackbar("Snackbar")
                     }
                 }
             )
