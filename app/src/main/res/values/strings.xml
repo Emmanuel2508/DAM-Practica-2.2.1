@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">Actividad</string>
+    <string name="materia">Desarollo de aplicaciones moviles</string>
+    <string name="nombre" translatable="false">"Emmanuel "</string>
+    <string name="apellido" translatable="false">Pedroza Perez</string>
+    <string name="title">Titulo</string>
+    <string name="back_btn">nose</string>
+    <string name="bottom_app_bar">Texto de abajo</string>
+    <string name="Williams">Williams</string>
+</resources>
