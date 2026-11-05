@@ -7,4 +7,9 @@
     <string name="back_btn">nose</string>
     <string name="bottom_app_bar">Texto de abajo</string>
     <string name="Williams">Williams</string>
+    <string name="options_menu">Ex\n</string>
+    <string name="calendario">Calendario</string>
+    <string name="alarma">Alarma</string>
+    <string name="archivos">Archivos y descargas</string>
+    <string name="title_activity_second">SecondActivity</string>
 </resources>

@@ -1,7 +1,11 @@
 package com.example.actividad
 
 import android.annotation.SuppressLint
+import android.content.Context
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
+import android.util.Log
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -10,6 +14,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -21,12 +26,23 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ExitToApp
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.AddLink
+import androidx.compose.material.icons.filled.ExitToApp
+import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Image
+import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.BottomAppBar
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -52,18 +68,44 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import androidx.lifecycle.lifecycleScope
 import com.example.actividad.ui.theme.ActividadTheme
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
+    private val TAG = "MainActivity"
+    private var keepSplash = true
     override fun onCreate(savedInstanceState: Bundle?) {
+        val splashScreen = installSplashScreen()
+        splashScreen.setKeepOnScreenCondition { keepSplash }
+        lifecycleScope.launch{
+            delay(3000)
+            keepSplash = false
+        }
         super.onCreate(savedInstanceState)
+        ShowToast("Funcion onCreate()")
         enableEdgeToEdge()
         setContent {
             ActividadTheme {
                 ViewContainer()
             }
         }
+    }
+    override fun onStart(){
+        super.onStart()
+        ShowToast("Funcion Onstart()")
+    }
+
+    fun ShowToast(message: String){
+        val toast = Toast.makeText(
+            this,
+            message,
+            Toast.LENGTH_LONG
+        )
+        toast.show()
+        Log.i(TAG, message)
     }
 }
 
@@ -196,7 +238,7 @@ fun ContentView() {
 )
 @Composable
 fun ViewContainer(){
-    val intentContext = LocalContext.current;
+    val context = LocalContext.current
     val scope = rememberCoroutineScope()
     val snackbarHostState = remember { SnackbarHostState() }
     Scaffold(
@@ -222,6 +264,23 @@ fun ViewContainer(){
                             tint = Color.White
                         )
                     }
+                },
+                actions ={
+                    IconButton(onClick = {openWebScreen(context)}) {
+                        Icon(
+                            imageVector = Icons.Default.AddLink,
+                            contentDescription = "Marcar como favorito",
+                            tint = Color.White
+                        )
+                    }
+                    IconButton(onClick = {}) {
+                        Icon(
+                            imageVector=Icons.Default.Share,
+                            contentDescription = "Compartir",
+                            tint = Color.White
+                        )
+                    }
+                    DropDownMenu()
                 }
             )
         },
@@ -257,6 +316,87 @@ fun ViewContainer(){
     ) { ContentView()}
 
 }
+
+@Composable
+fun DropDownMenu() {
+    var expanded by remember { mutableStateOf(false) }
+    Box {
+        IconButton(onClick = { expanded = true }) {
+            Icon(
+                imageVector = Icons.Default.MoreVert,
+                contentDescription = stringResource(R.string.options_menu),
+                tint= Color.White
+            )
+        }
+
+        DropdownMenu(
+            expanded = expanded,
+            onDismissRequest = { expanded = false }
+        ) {
+            DropdownMenuItem(
+                text = { Text(stringResource(R.string.calendario)) },
+                onClick = {
+                    expanded = false
+// Acción para Perfil
+                },
+                leadingIcon = {
+                    Icon(Icons.Default.Person, contentDescription = null)
+                }
+            )
+
+            DropdownMenuItem(
+                text = { Text(stringResource(R.string.alarma)) },
+                onClick = {
+                    expanded = false
+// Acción para Configuración
+                },
+                leadingIcon = {
+                    Icon(Icons.Default.Settings, contentDescription = null)
+                }
+            )
+
+            HorizontalDivider()
+
+            DropdownMenuItem(
+                text = { Text(stringResource(R.string.archivos)) },
+                onClick = {
+                    expanded = false
+// Acción para Cerrar sesión
+                },
+                leadingIcon = {
+                    Icon(Icons.Default.ExitToApp, contentDescription = null)
+                }
+            )
+        }
+    }
+}
+
+fun openWebScreen(context: Context){
+    try{
+        val url = Uri.parse("https://aguascalientes.tecnm.mx/")
+        val intent = Intent(Intent.ACTION_VIEW, url)
+        context.startActivity(intent)
+    } catch (e: Exception){
+        Toast.makeText(context,"Escoge un navegador",
+            Toast.LENGTH_LONG).show()
+    }
+}
+
+fun openAppMenu(context: Context){
+    val packageName = "com.google.android.calendar"
+    val launchIntent = context.packageManager.getLaunchIntentForPackage(packageName)
+    if (launchIntent !=null){
+        context.startActivity(launchIntent)
+    } else {
+        Toast.makeText(context, "App no instalada",
+            Toast.LENGTH_LONG).show()
+    }
+    //com.google.android.calendar
+    //com.google.android.apps
+    //com.google.android.deskclock
+}
+
+
 
 
 
