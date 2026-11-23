@@ -5,6 +5,9 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.provider.AlarmClock
+import android.provider.CalendarContract
+import android.provider.CalendarContract.Events
 import android.util.Log
 import android.widget.Toast
 import androidx.activity.ComponentActivity
@@ -70,6 +73,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
 import com.example.actividad.ui.theme.ActividadTheme
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -273,7 +280,7 @@ fun ViewContainer(){
                             tint = Color.White
                         )
                     }
-                    IconButton(onClick = {}) {
+                    IconButton(onClick = {Navegador(context)}) {
                         Icon(
                             imageVector=Icons.Default.Share,
                             contentDescription = "Compartir",
@@ -319,6 +326,7 @@ fun ViewContainer(){
 
 @Composable
 fun DropDownMenu() {
+    val context = LocalContext.current
     var expanded by remember { mutableStateOf(false) }
     Box {
         IconButton(onClick = { expanded = true }) {
@@ -335,9 +343,8 @@ fun DropDownMenu() {
         ) {
             DropdownMenuItem(
                 text = { Text(stringResource(R.string.calendario)) },
-                onClick = {
+                onClick = { CrearEvento(context)
                     expanded = false
-// Acción para Perfil
                 },
                 leadingIcon = {
                     Icon(Icons.Default.Person, contentDescription = null)
@@ -346,9 +353,8 @@ fun DropDownMenu() {
 
             DropdownMenuItem(
                 text = { Text(stringResource(R.string.alarma)) },
-                onClick = {
+                onClick = { CrearAlarma(context)
                     expanded = false
-// Acción para Configuración
                 },
                 leadingIcon = {
                     Icon(Icons.Default.Settings, contentDescription = null)
@@ -359,7 +365,7 @@ fun DropDownMenu() {
 
             DropdownMenuItem(
                 text = { Text(stringResource(R.string.archivos)) },
-                onClick = {
+                onClick = { VerArchivos(context)
                     expanded = false
 // Acción para Cerrar sesión
                 },
@@ -382,18 +388,48 @@ fun openWebScreen(context: Context){
     }
 }
 
-fun openAppMenu(context: Context){
-    val packageName = "com.google.android.calendar"
-    val launchIntent = context.packageManager.getLaunchIntentForPackage(packageName)
-    if (launchIntent !=null){
-        context.startActivity(launchIntent)
-    } else {
-        Toast.makeText(context, "App no instalada",
+fun CrearAlarma(context: Context){
+    try {
+        val intent = Intent(AlarmClock.ACTION_SET_ALARM).apply {
+            putExtra(AlarmClock.EXTRA_HOUR, 7)
+            putExtra(AlarmClock.EXTRA_MINUTES, 30)
+        }
+        context.startActivity(intent)
+    } catch (e: Exception){
+        Toast.makeText(context, "Error",
             Toast.LENGTH_LONG).show()
     }
-    //com.google.android.calendar
-    //com.google.android.apps
-    //com.google.android.deskclock
+}
+
+fun CrearEvento(context: Context){
+    try{
+        val intent = Intent(Intent.ACTION_INSERT).apply {
+            data = Events.CONTENT_URI
+            putExtra(Events.TITLE, "Dia de las madres")
+            putExtra(CalendarContract.EXTRA_EVENT_ALL_DAY, true)
+        }
+        context.startActivity(intent)
+    } catch (e: Exception) {
+        Toast.makeText(context, "Error",
+            Toast.LENGTH_LONG).show()
+    }
+}
+
+fun VerArchivos(context: Context){
+    try {
+        val intent = Intent(Intent.ACTION_GET_CONTENT).apply {
+            type = "*/*"
+        }
+        context.startActivity(intent)
+    } catch (e: Exception) {
+        Toast.makeText(context, "Error",
+            Toast.LENGTH_LONG).show()
+    }
+}
+
+fun Navegador(context: Context){
+    val intent = Intent(context, SecondActivity::class.java)
+    context.startActivity(intent)
 }
 
 
